@@ -1,56 +1,54 @@
 #!/bin/bash
 
-# ============================================
-# deploy.sh - Docker Deploy Script
-# Usage: bash deploy.sh
-# ============================================
+# Deploy script untuk Wedding Invitation Imah & Alvin
+echo "🚀 Starting deployment..."
 
-set -e
+# Stop existing containers
+echo "📦 Stopping existing containers..."
+docker compose down
 
-APP_NAME="wedding-invitation"
-IMAGE_NAME="wedding-invitation"
+# Remove old images
+echo "🗑️ Cleaning up old images..."
+docker image prune -f
 
-echo "🚀 Starting Docker deployment..."
+# Build and start containers
+echo "🔨 Building and starting containers..."
+docker compose up -d --build
 
-# ── 1. Pull latest code ──────────────────────
-echo "📦 Pulling latest code..."
-git pull origin main
+# Wait for containers to be ready
+echo "⏳ Waiting for containers to be ready..."
+sleep 30
 
-# ── 2. Build Docker image ────────────────────
-echo "🐳 Building Docker image..."
-docker build -t $IMAGE_NAME:latest .
-
-# ── 3. Stop & remove container lama ─────────
-echo "🛑 Stopping old containers..."
-docker compose down --remove-orphans
-
-# ── 4. Jalankan container baru ───────────────
-echo "▶️  Starting new containers..."
-docker compose up -d
-
-# ── 5. Tunggu container ready ────────────────
-echo "⏳ Waiting for container to be ready..."
-sleep 5
-
-# ── 6. Jalankan migration ────────────────────
-echo "🗄️  Running migrations..."
+# Run migrations
+echo "🗄️ Running migrations..."
 docker compose exec app php artisan migrate --force
 
-# ── 7. Resize gallery images ─────────────────
-echo "🖼️  Resizing gallery images..."
+# Resize gallery images
+echo "🖼️ Resizing gallery images..."
 docker compose exec app php artisan gallery:resize 2>/dev/null || true
 
-# ── 8. Clear & cache ulang ───────────────────
-echo "⚡ Caching config, routes, views..."
+# Cache config, routes, views
+echo "⚡ Caching..."
 docker compose exec app php artisan config:cache
 docker compose exec app php artisan route:cache
 docker compose exec app php artisan view:cache
 
-# ── 9. Set permissions ───────────────────────
-echo "🔒 Setting permissions..."
-docker compose exec app chown -R www-data:www-data storage bootstrap/cache
-
-echo ""
-echo "✅ Deployment complete!"
-echo "🌐 Running at: http://localhost:8080"
+# Check container status
+echo "📊 Container status:"
 docker compose ps
+
+# Show logs
+echo "📝 Recent logs:"
+docker compose logs --tail=50
+
+echo "✅ Deployment completed!"
+echo "🌐 Application is running on: http://your-vps-ip:8080"
+
+# Health check
+echo "🏥 Running health check..."
+if curl -f http://localhost:8080 > /dev/null 2>&1; then
+    echo "✅ Application is healthy!"
+else
+    echo "❌ Application health check failed!"
+    echo "📝 Check logs with: docker compose logs app"
+fi
