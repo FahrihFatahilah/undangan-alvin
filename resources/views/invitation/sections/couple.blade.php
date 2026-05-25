@@ -28,7 +28,7 @@
                 </div>
                 <h3 class="font-display text-4xl text-primary mb-2">Imah</h3>
                 <p class="font-heading text-base text-text-dark">Muslimahtiun Baadiah, S.K.M</p>
-                <p class="font-body text-sm text-text-dark/80 mt-2">Putri dari<br>Bapak ... & Ibu ...</p>
+                <p class="font-body text-sm text-text-dark/80 mt-2">Putri dari<br>Bapak H.Arsyik (Almarhum) & Ibu Farinah</p>
             </div>
 
             <div data-animate="fade-left" class="text-center">
@@ -39,7 +39,8 @@
                 </div>
                 <h3 class="font-display text-4xl text-primary mb-2">Alvin</h3>
                 <p class="font-heading text-base text-text-dark">Alvin Febriyand, S.H</p>
-                <p class="font-body text-sm text-text-dark/80 mt-2">Putra dari<br>Bapak ... & Ibu ...</p>
+                <p class="font-body text-sm text-text-dark/80 mt-2">Putra dari<br>Bapak Muhammad Tahir Body S.Pd
+ & Ibu Siti Asmah S.Pd</p>
             </div>
         </div>
 
