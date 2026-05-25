@@ -3,7 +3,7 @@
     <div class="max-w-4xl mx-auto text-center">
         {{-- Bismillah --}}
         <div data-animate="fade-down" class="mb-12">
-            <p class="font-label text-4xl tracking-[0.3em] text-primary mb-4">بِسْمِ اللَّهِ الرَّحْمَنِ الرَّحِيْم</p>
+            <p class="font-label text-2xl tracking-[0.3em] text-primary mb-4">بِسْمِ اللَّهِ الرَّحْمَنِ الرَّحِيْم</p>
             <div class="gold-divider max-w-xs mx-auto">
                 <span class="text-secondary">✦</span>
             </div>
