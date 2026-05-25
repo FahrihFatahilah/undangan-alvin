@@ -1,52 +1,56 @@
 #!/bin/bash
 
 # ============================================
-# deploy.sh - Wedding Invitation Deploy Script
+# deploy.sh - Docker Deploy Script
 # Usage: bash deploy.sh
 # ============================================
 
 set -e
 
-echo "🚀 Starting deployment..."
+APP_NAME="wedding-invitation"
+IMAGE_NAME="wedding-invitation"
+
+echo "🚀 Starting Docker deployment..."
 
 # ── 1. Pull latest code ──────────────────────
 echo "📦 Pulling latest code..."
 git pull origin main
 
-# ── 2. Install/update dependencies ──────────
-echo "📚 Installing composer dependencies..."
-composer install --no-dev --optimize-autoloader --no-interaction
+# ── 2. Build Docker image ────────────────────
+echo "🐳 Building Docker image..."
+docker build -t $IMAGE_NAME:latest .
 
-# ── 3. Copy .env jika belum ada ──────────────
-if [ ! -f .env ]; then
-    echo "⚙️  Creating .env from .env.example..."
-    cp .env.example .env
-    php artisan key:generate
-fi
+# ── 3. Stop & remove container lama ─────────
+echo "🛑 Stopping old containers..."
+docker compose down --remove-orphans
 
-# ── 4. Optimasi Laravel ──────────────────────
-echo "⚡ Optimizing Laravel..."
-php artisan config:cache
-php artisan route:cache
-php artisan view:cache
+# ── 4. Jalankan container baru ───────────────
+echo "▶️  Starting new containers..."
+docker compose up -d
 
-# ── 5. Jalankan migration ────────────────────
+# ── 5. Tunggu container ready ────────────────
+echo "⏳ Waiting for container to be ready..."
+sleep 5
+
+# ── 6. Jalankan migration ────────────────────
 echo "🗄️  Running migrations..."
-php artisan migrate --force
+docker compose exec app php artisan migrate --force
 
-# ── 6. Storage link ──────────────────────────
-echo "🔗 Creating storage link..."
-php artisan storage:link --force 2>/dev/null || true
-
-# ── 7. Set permissions ───────────────────────
-echo "🔒 Setting permissions..."
-chmod -R 775 storage bootstrap/cache
-chown -R www-data:www-data storage bootstrap/cache 2>/dev/null || true
-
-# ── 8. Resize gallery images ─────────────────
+# ── 7. Resize gallery images ─────────────────
 echo "🖼️  Resizing gallery images..."
-php artisan gallery:resize 2>/dev/null || true
+docker compose exec app php artisan gallery:resize 2>/dev/null || true
+
+# ── 8. Clear & cache ulang ───────────────────
+echo "⚡ Caching config, routes, views..."
+docker compose exec app php artisan config:cache
+docker compose exec app php artisan route:cache
+docker compose exec app php artisan view:cache
+
+# ── 9. Set permissions ───────────────────────
+echo "🔒 Setting permissions..."
+docker compose exec app chown -R www-data:www-data storage bootstrap/cache
 
 echo ""
 echo "✅ Deployment complete!"
-echo "🌐 App URL: $(grep APP_URL .env | cut -d '=' -f2)"
+echo "🌐 Running at: http://localhost:8080"
+docker compose ps
