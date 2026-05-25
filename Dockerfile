@@ -1,17 +1,9 @@
-FROM node:22-alpine AS node-builder
-WORKDIR /app
-COPY package.json package-lock.json* ./
-RUN npm ci --ignore-scripts
-COPY vite.config.js ./
-COPY resources ./resources
-COPY public ./public
-RUN npm run build
-
-FROM php:8.3-fpm-alpine AS app
+FROM php:8.3-fpm-alpine
 WORKDIR /var/www/html
 
-RUN apk add --no-cache nginx sqlite sqlite-dev \
-    && docker-php-ext-install pdo pdo_sqlite opcache
+RUN apk add --no-cache nginx sqlite sqlite-dev libpng-dev libjpeg-turbo-dev \
+    && docker-php-ext-configure gd --with-jpeg \
+    && docker-php-ext-install pdo pdo_sqlite opcache gd
 
 COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 
@@ -19,7 +11,6 @@ COPY composer.json composer.lock ./
 RUN composer install --no-dev --optimize-autoloader --no-scripts --no-interaction
 
 COPY . .
-COPY --from=node-builder /app/public/build ./public/build
 
 RUN cp .env.example .env \
     && php artisan key:generate \
