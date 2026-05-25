@@ -21,13 +21,13 @@
 
         <div class="mt-16 pt-8 border-t border-secondary/20">
             <p class="font-body text-sm text-text-dark/50">
-                © dammm | invitation · 
+                
                 <a 
                     href="https://instagram.com/ffatahilah__" 
                     target="_blank" 
                     class="hover:text-primary transition-colors"
                 >
-                    Instagram
+                    © dammm | invitation · 
                 </a>
             </p>
         </div>
